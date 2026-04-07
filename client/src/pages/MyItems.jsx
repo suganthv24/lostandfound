@@ -28,7 +28,7 @@ const MyItems = () => {
   }, [user]);
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this item?')) {
+    if (window.confirm('Are you sure you want to delete this artifact?')) {
       try {
         await deleteItem(id);
         setItems(items.filter(item => item._id !== id));
@@ -49,54 +49,60 @@ const MyItems = () => {
   };
 
   if (loading) return (
-    <div className="flex justify-center py-40">
+    <div className="flex justify-center py-60">
       <Loader />
     </div>
   );
 
   return (
-    <div className="max-w-6xl mx-auto py-12 px-4 animate-fade-in">
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
-        <div className="space-y-2">
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">Your <span className="glow-text">Reports</span></h1>
-          <p className="text-muted text-lg">Manage the items you've posted to the community.</p>
+    <div className="page-container">
+      <header className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-white/5 pb-12">
+        <div className="max-w-2xl">
+          <h1 className="main-title mb-4">
+            Legacy <br />
+            <span className="glow-text">Curations</span>
+          </h1>
+          <p className="text-xl text-muted font-medium">Manage the items you've submitted to the university digital gallery.</p>
         </div>
         <Link 
           to="/create" 
-          className="btn-primary flex items-center gap-2 group"
+          className="btn-primary !px-8 !py-4 flex items-center gap-3 hover:scale-105 active:scale-95 transition-all"
         >
-          <span className="text-xl transition-transform group-hover:rotate-90">+</span> Report New Item
+          <span className="text-2xl">+</span> Report New Artifact
         </Link>
-      </div>
+      </header>
 
       {items.length === 0 ? (
-        <div className="glass-card text-center py-20 animate-slide-up max-w-2xl mx-auto">
-          <div className="text-6xl mb-6 opacity-80">📝</div>
-          <h3 className="text-2xl font-bold mb-3">No reports yet</h3>
-          <p className="text-muted max-w-sm mx-auto mb-8">Items you report will appear here. Start by reporting something you've found or lost.</p>
-          <Link to="/create" className="btn-outline inline-block">Start Now</Link>
+        <div className="sidebar-card text-center py-32 animate-fade-in !rounded-[3rem] border-dashed border-2 border-white/5">
+          <div className="w-24 h-24 bg-indigo-500/10 rounded-full flex items-center justify-center mx-auto mb-8">
+             <span className="text-5xl">📝</span>
+          </div>
+          <h3 className="text-3xl font-black mb-4">No curations yet</h3>
+          <p className="text-muted max-w-sm mx-auto text-lg leading-relaxed mb-10">Items you report will appear here. Start by documenting something you've found or lost.</p>
+          <Link to="/create" className="btn-outline inline-block !rounded-2xl">Create First Report</Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6">
+        <div className="space-y-8 lg:space-y-12">
           {items.map((item, index) => (
             <div 
               key={item._id} 
-              className="glass-card !p-0 overflow-hidden flex flex-col md:flex-row animate-slide-up"
+              className="glass-card !p-0 overflow-hidden flex flex-col lg:flex-row animate-slide-up group hover:border-white/10 transition-all !rounded-[2.5rem]"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
-              <div className="w-full md:w-64 h-48 md:h-auto shrink-0 relative">
+              <div className="w-full lg:w-80 h-72 lg:h-auto shrink-0 relative overflow-hidden">
                 <img 
-                  src={item.image || 'https://via.placeholder.com/400x400?text=No+Image'} 
+                  src={item.imageUrl || item.image || 'https://via.placeholder.com/400x400?text=No+Image'} 
                   alt={item.title} 
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  onError={(e) => { e.target.src = 'https://via.placeholder.com/400x400?text=Image+Unavailable'; }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent"></div>
               </div>
-              <div className="p-8 flex-grow flex flex-col md:flex-row md:items-center justify-between gap-8">
-                <div className="space-y-4 max-w-md">
-                  <div className="flex items-center gap-4 flex-wrap">
-                    <h3 className="text-2xl font-bold">{item.title}</h3>
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
+              <div className="p-10 lg:p-12 flex-grow flex flex-col xl:flex-row xl:items-center justify-between gap-12">
+                <div className="space-y-6 flex-grow">
+                  <div className="flex items-center gap-6 flex-wrap">
+                    <h3 className="text-3xl font-black tracking-tight">{item.title}</h3>
+                    <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] border shadow-sm ${
                       item.status === 'resolved' 
                         ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
                         : 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
@@ -104,39 +110,39 @@ const MyItems = () => {
                       {item.status || 'active'}
                     </span>
                   </div>
-                  <div className="flex flex-col gap-2 text-muted font-medium">
-                    <div className="flex items-center gap-2">
-                      <span className="opacity-60">📍</span> {item.location}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-muted font-bold text-sm">
+                    <div className="flex items-center gap-3">
+                      <span className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-lg">📍</span> {item.location}
                     </div>
-                    <div className="flex items-center gap-2 text-xs opacity-60">
-                      <span className="">📅</span> Posted on {new Date(item.date).toLocaleDateString()}
+                    <div className="flex items-center gap-3">
+                      <span className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-lg">📅</span> {new Date(item.dateTime || item.date).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })}
                     </div>
                   </div>
                 </div>
                 
-                <div className="flex flex-wrap md:flex-nowrap gap-3 shrink-0">
+                <div className="flex flex-wrap lg:flex-nowrap gap-4 shrink-0 justify-end">
                   <button 
                     onClick={() => handleStatusUpdate(item._id, item.status)}
-                    className={`flex-1 md:flex-none px-6 py-3 rounded-2xl font-bold text-sm transition-all active:scale-95 border ${
+                    className={`flex-1 lg:flex-none px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all active:scale-95 border ${
                       item.status === 'resolved' 
-                        ? 'bg-transparent border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/10' 
-                        : 'bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-500/20'
+                        ? 'bg-transparent border-white/10 text-muted hover:text-white hover:bg-white/5' 
+                        : 'bg-indigo-500 text-white border-indigo-400 hover:bg-indigo-400 shadow-xl shadow-indigo-500/20'
                     }`}
                   >
-                    {item.status === 'resolved' ? 'Re-activate' : 'Mark Resolved'}
+                    {item.status === 'resolved' ? 'Reactive Artifact' : 'Mark Resolved'}
                   </button>
-                  <div className="flex gap-3 w-full md:w-auto">
+                  <div className="flex gap-4 w-full lg:w-auto">
                     <button 
                       onClick={() => handleDelete(item._id)}
-                      className="flex-1 md:flex-none px-6 py-3 rounded-2xl font-bold text-sm bg-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-500/20 transition-all active:scale-95"
+                      className="flex-1 lg:flex-none px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest bg-rose-500/5 border border-rose-500/10 text-rose-500 hover:bg-rose-500/10 hover:border-rose-500/30 transition-all active:scale-95"
                     >
                       Delete
                     </button>
                     <Link 
                       to={`/items/${item._id}`}
-                      className="flex-1 md:flex-none btn-outline !py-3 !px-8 text-center text-sm font-bold"
+                      className="flex-1 lg:flex-none btn-outline !py-4 !px-10 text-center text-xs font-black uppercase tracking-widest !rounded-2xl"
                     >
-                      View
+                      Inspect
                     </Link>
                   </div>
                 </div>

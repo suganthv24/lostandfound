@@ -1,16 +1,32 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useMemo } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { createItem } from '../services/itemApi';
 import ImageUpload from '../components/ImageUpload';
+import ItemCard from '../components/ItemCard';
+import { useAuth } from '../context/AuthContext';
+
+const CATEGORIES = ['Electronics', 'Documents', 'Personal Items', 'Accessories', 'Books', 'Other'];
+const LOCATIONS = [
+  'Main Library Hall', 
+  'Student Center', 
+  'Cafeteria', 
+  'Science Block', 
+  'Sports Complex', 
+  'Administration', 
+  'Hostel Block A', 
+  'Hostel Block B'
+];
 
 const CreateItem = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    location: '',
-    date: '',
+    location: LOCATIONS[0],
+    date: new Date().toISOString().split('T')[0],
     type: 'lost',
+    category: CATEGORIES[0],
     image: '',
   });
   const [loading, setLoading] = useState(false);
@@ -34,146 +50,233 @@ const CreateItem = () => {
       const dataToSubmit = {
         ...formData,
         imageUrl: formData.image,
-        dateTime: formData.date ? new Date(formData.date).toISOString() : new Date().toISOString(),
+        dateTime: new Date(formData.date).toISOString(),
       };
       await createItem(dataToSubmit);
-      navigate('/');
+      navigate('/home');
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create item. Please check your inputs.');
+      setError(err.response?.data?.message || 'Failed to submit report. Please check your inputs.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div className="max-w-4xl mx-auto py-12 px-4 animate-fade-in">
-      <div className="glass-card !p-0 overflow-hidden">
-        <div className="p-8 md:p-12 border-b border-glass-border">
-          <h1 className="text-3xl md:text-4xl font-extrabold mb-2">Report an <span className="glow-text">Item</span></h1>
-          <p className="text-muted leading-relaxed">Fill in the details to help the community find or return an item.</p>
-        </div>
+  const previewItem = useMemo(() => ({
+    ...formData,
+    _id: 'preview',
+    createdAt: new Date().toISOString(),
+  }), [formData]);
 
-        <form onSubmit={handleSubmit} className="p-8 md:p-12 space-y-10">
+  return (
+    <div className="max-w-7xl mx-auto py-12 px-6">
+      <header className="mb-16 animate-fade-in max-w-2xl">
+        <h1 className="text-5xl md:text-6xl font-black mb-6 tracking-tighter">
+          Report an <span className="glow-text">Artifact</span>
+        </h1>
+        <p className="text-xl text-muted leading-relaxed font-medium">
+          Document a lost or found item within the university ecosystem. Our curators will verify the listing to maintain the integrity of our digital gallery.
+        </p>
+      </header>
+
+      <div className="flex flex-col xl:flex-row gap-12 items-start">
+        {/* Left Side: Form */}
+        <form onSubmit={handleSubmit} className="flex-grow w-full space-y-16">
           {error && (
-            <div className="bg-rose-500/10 border-l-4 border-rose-500 p-4 rounded-xl animate-shake">
-              <p className="text-rose-400 text-sm font-medium">{error}</p>
+            <div className="bg-rose-500/10 border-l-4 border-rose-500 p-6 rounded-2xl animate-shake">
+              <p className="text-rose-400 font-bold flex items-center gap-3">
+                <span className="text-xl">⚠️</span> {error}
+              </p>
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            <div className="space-y-6">
+          {/* Type Toggle */}
+          <section className="sidebar-card !rounded-[2.5rem]">
+            <p className="text-[10px] font-black text-muted uppercase tracking-[0.2em] mb-6 mb-4 px-4">Item Status</p>
+            <div className="flex bg-black/40 p-1.5 rounded-[2rem] gap-1">
+              {['lost', 'found'].map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => setFormData(p => ({ ...p, type: t }))}
+                  className={`flex-1 py-4 rounded-[1.5rem] font-bold text-sm transition-all capitalize ${
+                    formData.type === t 
+                      ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/30' 
+                      : 'text-muted hover:bg-white/5'
+                  }`}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {/* Section 01 */}
+          <section className="form-section">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="section-number">01</div>
+              <h2 className="text-2xl font-black tracking-tight">Identity & Taxonomy</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-2">
-                <label className="text-sm font-bold text-muted uppercase tracking-wider pl-1">Item Title</label>
+                <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">Item Name</label>
                 <input
                   type="text"
                   name="title"
                   required
-                  placeholder="e.g. Lost Black Wallet"
+                  placeholder="e.g. Silver MacBook Air M2"
                   className="input-field"
                   value={formData.title}
                   onChange={handleChange}
                 />
               </div>
-
               <div className="space-y-2">
-                <label className="text-sm font-bold text-muted uppercase tracking-wider pl-1">Type</label>
-                <div className="flex gap-4">
-                  <label className="flex-1 group cursor-pointer">
-                    <input
-                      type="radio"
-                      name="type"
-                      value="lost"
-                      className="hidden peer"
-                      checked={formData.type === 'lost'}
-                      onChange={handleChange}
-                    />
-                    <div className="text-center p-4 rounded-2xl border border-glass-border bg-input-bg peer-checked:border-rose-500/50 peer-checked:bg-rose-500/10 transition-all font-bold text-muted peer-checked:text-rose-400 group-hover:border-rose-500/30">
-                      LOST
-                    </div>
-                  </label>
-                  <label className="flex-1 group cursor-pointer">
-                    <input
-                      type="radio"
-                      name="type"
-                      value="found"
-                      className="hidden peer"
-                      checked={formData.type === 'found'}
-                      onChange={handleChange}
-                    />
-                    <div className="text-center p-4 rounded-2xl border border-glass-border bg-input-bg peer-checked:border-emerald-500/50 peer-checked:bg-emerald-500/10 transition-all font-bold text-muted peer-checked:text-emerald-400 group-hover:border-emerald-500/30">
-                      FOUND
-                    </div>
-                  </label>
+                <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">Category</label>
+                <select 
+                  name="category"
+                  className="input-field"
+                  value={formData.category}
+                  onChange={handleChange}
+                >
+                  {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+            </div>
+          </section>
+
+          {/* Section 02 */}
+          <section className="form-section">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="section-number">02</div>
+              <h2 className="text-2xl font-black tracking-tight">Visual Proof</h2>
+            </div>
+            <div className="glass-card !p-8 border-dashed border-2 bg-indigo-500/[0.02] hover:bg-indigo-500/[0.05] transition-colors">
+              <ImageUpload onUpload={handleImageUpload} />
+            </div>
+          </section>
+
+          {/* Section 03 */}
+          <section className="form-section">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="section-number">03</div>
+              <h2 className="text-2xl font-black tracking-tight">Context & Provenance</h2>
+            </div>
+            
+            <div className="space-y-8">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">Detailed Description</label>
+                <textarea
+                  name="description"
+                  required
+                  rows="5"
+                  placeholder="Describe specific markings, stickers, or distinguishing features..."
+                  className="input-field min-h-[160px] resize-none"
+                  value={formData.description}
+                  onChange={handleChange}
+                ></textarea>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">Campus Location</label>
+                  <select 
+                    name="location"
+                    className="input-field"
+                    value={formData.location}
+                    onChange={handleChange}
+                  >
+                    {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">Date & Approximate Time</label>
+                  <input
+                    type="date"
+                    name="date"
+                    required
+                    className="input-field"
+                    value={formData.date}
+                    onChange={handleChange}
+                  />
                 </div>
               </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-muted uppercase tracking-wider pl-1">Location</label>
-                <input
-                  type="text"
-                  name="location"
-                  required
-                  placeholder="Where was it seen?"
-                  className="input-field"
-                  value={formData.location}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-muted uppercase tracking-wider pl-1">Date</label>
-                <input
-                  type="date"
-                  name="date"
-                  required
-                  className="input-field"
-                  value={formData.date}
-                  onChange={handleChange}
-                />
-              </div>
             </div>
+          </section>
 
-            <div className="space-y-6">
-              <label className="text-sm font-bold text-muted uppercase tracking-wider pl-1">Item Image</label>
-              <div className="glass-card !p-6 border-dashed border-2 border-glass-border bg-input-bg/30">
-                <ImageUpload onUpload={handleImageUpload} />
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-bold text-muted uppercase tracking-wider pl-1">Description</label>
-            <textarea
-              name="description"
-              required
-              rows="4"
-              placeholder="Provide more details like color, brand, or specific markings..."
-              className="input-field min-h-[120px] resize-none"
-              value={formData.description}
-              onChange={handleChange}
-            ></textarea>
-          </div>
-
-          <div className="pt-4">
+          <div className="flex items-center justify-between pt-10 border-t border-white/5">
+            <button 
+              type="button"
+              onClick={() => navigate('/')}
+              className="text-muted hover:text-white font-bold text-sm transition-colors px-6"
+            >
+              Discard Draft
+            </button>
             <button
               type="submit"
-              disabled={loading}
-              className={`w-full btn-primary py-5 text-lg ${
-                loading ? 'opacity-70 cursor-not-allowed' : ''
+              disabled={loading || !formData.image}
+              className={`btn-primary !px-12 !py-5 text-lg min-w-[240px] ${
+                (loading || !formData.image) ? 'opacity-50 cursor-not-allowed grayscale' : ''
               }`}
             >
-              {loading ? (
-                <div className="flex items-center justify-center gap-3">
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  <span>Reporting...</span>
-                </div>
-              ) : (
-                <span>Report Item</span>
-              )}
+              {loading ? 'Processing...' : 'Submit Report'}
             </button>
           </div>
         </form>
+
+        {/* Right Side: Sidebar */}
+        <aside className="w-full xl:w-[420px] space-y-8 sticky top-24">
+          {/* Institutional Privacy Card */}
+          <div className="sidebar-card border-emerald-500/10 !bg-emerald-500/[0.02]">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm">🛡️</div>
+              <h3 className="font-bold text-emerald-400">Institutional Privacy</h3>
+            </div>
+            <p className="text-xs text-muted leading-relaxed">
+              Artifacts reported are only visible to <span className="text-emerald-400 font-bold">verified university accounts</span>. Your personal contact data is encrypted and only shared when you approve a claim request.
+            </p>
+          </div>
+
+          {/* Live Preview Card */}
+          <div className="space-y-4">
+            <p className="text-[10px] font-black text-muted uppercase tracking-[0.2em] px-2 flex justify-between">
+              <span>Preview Artifact</span>
+              <span className="text-indigo-400 animate-pulse">Live</span>
+            </p>
+            <div className="pointer-events-none opacity-80 scale-[0.95] origin-top">
+              <ItemCard item={previewItem} />
+            </div>
+          </div>
+
+          {/* Submission Tips */}
+          <div className="sidebar-card">
+            <h3 className="font-bold mb-6 text-sm flex items-center gap-2">
+               <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+               Submission Tips
+            </h3>
+            <ul className="space-y-4">
+              {[
+                { n: '01', t: 'Use high-contrast photos against neutral backgrounds.' },
+                { n: '02', t: 'Do not include sensitive personal IDs in public photos.' },
+                { n: '03', t: 'Be as specific as possible with the "Campus Location" dropdown.' }
+              ].map(tip => (
+                <li key={tip.n} className="flex gap-4">
+                  <span className="text-[10px] font-black text-indigo-400 pt-1">{tip.n}</span>
+                  <p className="text-xs text-muted leading-relaxed">{tip.t}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </aside>
       </div>
+
+      <footer className="mt-24 pt-12 border-t border-white/5 flex flex-wrap gap-8 text-[10px] font-bold text-muted uppercase tracking-widest">
+        <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+        <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+        <a href="#" className="hover:text-white transition-colors">Campus Safety</a>
+        <a href="#" className="hover:text-white transition-colors">Contact Support</a>
+        <span className="ml-auto opacity-30">© 2026 University LostAndFound ecosystem</span>
+      </footer>
     </div>
   );
 };

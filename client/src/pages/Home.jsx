@@ -32,56 +32,54 @@ const Home = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-fade-in">
-      <header className="text-center mb-16 space-y-6">
-        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
-          Find what you <span className="glow-text">lost</span>,<br className="sm:hidden" /> return what you <span className="glow-text">found</span>.
+    <div className="page-container">
+      <header className="mb-16 max-w-3xl">
+        <h1 className="main-title">
+          Explore the University <br />
+          <span className="glow-text">Artifact Gallery</span>
         </h1>
-        <p className="text-lg md:text-xl text-muted max-w-2xl mx-auto leading-relaxed">
-          The community-driven lost and found platform. Search through reported items or report a new one to help others.
+        <p className="sub-title">
+          The community-driven lost and found platform. Search through reported items or report a new one to maintain the integrity of our campus ecosystem.
         </p>
-        <div className="pt-8 px-4">
+        <div className="max-w-xl">
           <SearchBar onSearch={handleSearch} />
         </div>
       </header>
 
       <main>
         {loading ? (
-          <div className="flex justify-center py-20">
+          <div className="flex justify-center py-40">
             <Loader />
           </div>
         ) : error ? (
-          <div className="glass-card text-center py-16 max-w-lg mx-auto">
-            <div className="text-5xl mb-4 text-rose-500">⚠️</div>
-            <p className="text-rose-400 font-medium text-lg mb-6">{error}</p>
+          <div className="glass-card text-center py-20 bg-rose-500/5 border-rose-500/20 max-w-lg mx-auto !rounded-3xl">
+             <span className="text-5xl block mb-6 animate-bounce">⚠️</span>
+            <p className="text-rose-400 font-bold text-xl mb-8">{error}</p>
             <button 
               onClick={() => fetchItems()} 
-              className="btn-outline"
+              className="btn-outline border-rose-500/30 hover:bg-rose-500/10"
             >
-              Try Again
+              Retry Connection
             </button>
           </div>
         ) : items.length === 0 ? (
-          <div className="glass-card text-center py-20 animate-slide-up max-w-3xl mx-auto">
-            <div className="relative inline-block mb-6">
-              <span className="text-7xl">🔍</span>
-              <div className="absolute -top-2 -right-2 w-4 h-4 bg-indigo-500 rounded-full animate-ping"></div>
+          <div className="sidebar-card text-center py-32 animate-fade-in !rounded-[3rem] border-dashed border-2 border-white/5">
+            <div className="w-24 h-24 bg-indigo-500/10 rounded-full flex items-center justify-center mx-auto mb-8">
+               <span className="text-5xl">🔍</span>
             </div>
-            <h3 className="text-2xl font-bold mb-3">No items found</h3>
-            <p className="text-muted max-w-md mx-auto">
-              We couldn't find anything matching your search. Try adjusting your keywords or be the first to report this item.
+            <h3 className="text-3xl font-black mb-4">No artifacts detected</h3>
+            <p className="text-muted max-w-md mx-auto text-lg leading-relaxed mb-10">
+              Our sensors haven't picked up any items matching your criteria. Try widening your search parameters.
             </p>
-            <div className="mt-8">
-              <button 
-                onClick={() => fetchItems()} 
-                className="btn-outline text-sm"
-              >
-                View All Items
-              </button>
-            </div>
+            <button 
+              onClick={() => fetchItems()} 
+              className="btn-primary !px-10"
+            >
+              Reset Search
+            </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 lg:gap-12">
             {items.map((item, index) => (
               <div key={item._id} className="animate-slide-up" style={{ animationDelay: `${index * 0.05}s` }}>
                 <ItemCard item={item} />

@@ -41,6 +41,10 @@ const itemSchema = new mongoose.Schema({
     enum: ['lost', 'found'],
     required: true,
   },
+  category: {
+    type: String,
+    default: 'Other',
+  },
   createdAt: {
 
     type: Date,

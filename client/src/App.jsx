@@ -23,7 +23,7 @@ function App() {
       <AuthProvider>
         <div className="app-container min-h-screen flex flex-col">
           <Navbar />
-          <main className="flex-grow container mx-auto px-4 py-8">
+          <main className="flex-grow w-full block">
             <Routes>
               <Route path="/" element={<Navigate to="/home" replace />} />
 

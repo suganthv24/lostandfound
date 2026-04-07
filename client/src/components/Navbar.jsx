@@ -15,58 +15,64 @@ const Navbar = () => {
 
   const navLinks = [
     { name: 'Home', path: '/home' },
-    { name: 'Report Item', path: '/create', protected: true },
     { name: 'My Items', path: '/my-items', protected: true },
-    { name: 'Dashboard', path: '/dashboard', protected: true },
+    { name: 'Report', path: '/create', protected: true },
   ];
 
   const filteredLinks = navLinks.filter(link => !link.protected || user);
 
   return (
-    <nav className="sticky top-0 z-50 w-full px-6 py-4 animate-slide-down">
-      <div className="max-w-7xl mx-auto glass-card !p-3 !rounded-[2rem] flex items-center justify-between border-white/10 shadow-2xl shadow-indigo-500/10">
-        <Link to="/" className="flex items-center gap-3 pl-4 group">
-          <div className="w-10 h-10 bg-indigo-500 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/40 group-hover:rotate-12 transition-transform">
-            <span className="text-white text-xl">🔍</span>
+    <nav className="w-full border-b border-white/5 bg-[#020617] sticky top-0 z-50">
+      <div 
+        className="mx-auto px-6 lg:px-12 py-5 flex items-center justify-between"
+        style={{ maxWidth: '1280px', width: '100%' }}
+      >
+        <div className="flex items-center gap-12">
+          <Link to="/" className="text-xl font-black tracking-tighter flex items-center gap-2">
+            <span className="glow-text">Surya P</span>
+          </Link>
+          <div className="hidden md:flex items-center gap-8">
+            {filteredLinks.map((link) => (
+              <Link 
+                key={link.path}
+                to={link.path}
+                className={`text-[10px] font-black uppercase tracking-[0.2rem] transition-all relative py-1 ${
+                  location.pathname === link.path 
+                    ? 'text-white' 
+                    : 'text-muted hover:text-white'
+                }`}
+              >
+                {link.name}
+                {location.pathname === link.path && (
+                  <span className="absolute -bottom-2 left-0 w-full h-0.5 bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]"></span>
+                )}
+              </Link>
+            ))}
           </div>
-          <span className="text-xl font-black tracking-tighter glow-text">Lost<span className="text-slate-200">And</span>Found</span>
-        </Link>
-
-        {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-1">
-          {filteredLinks.map((link) => (
-            <Link 
-              key={link.path}
-              to={link.path}
-              className={`px-6 py-2 rounded-2xl text-sm font-bold transition-all ${
-                location.pathname === link.path 
-                  ? 'bg-white/10 text-white' 
-                  : 'text-muted hover:text-white hover:bg-white/5'
-              }`}
-            >
-              {link.name}
-            </Link>
-          ))}
         </div>
 
-        <div className="flex items-center gap-4 pr-2">
+        <div className="flex items-center gap-6">
           {user ? (
             <div className="flex items-center gap-4">
-              <div className="hidden sm:flex flex-col items-end">
-                <span className="text-[10px] font-black text-muted uppercase tracking-widest leading-none mb-1">Authenticated</span>
-                <span className="text-sm font-bold text-slate-200">{user.name}</span>
-              </div>
+               <Link 
+                to="/dashboard" 
+                className={`w-10 h-10 rounded-xl border border-white/10 flex items-center justify-center hover:bg-white/5 transition-colors ${
+                  location.pathname === '/dashboard' ? 'bg-white/10 border-white/30' : ''
+                }`}
+              >
+                <span className="text-lg">👤</span>
+              </Link>
               <button 
                 onClick={handleLogout}
-                className="btn-outline !py-2 !px-4 text-xs font-bold border-rose-500/20 text-rose-400 hover:bg-rose-500/10 hover:border-rose-500/40"
+                className="text-[10px] font-black text-muted hover:text-rose-400 uppercase tracking-widest transition-colors"
               >
-                Logout
+                Log Out
               </button>
             </div>
           ) : (
             <Link 
               to="/login"
-              className="btn-primary !py-2 !px-6 text-xs font-bold"
+              className="text-[10px] font-black text-white hover:text-indigo-400 uppercase tracking-widest transition-colors"
             >
               Sign In
             </Link>
@@ -74,34 +80,38 @@ const Navbar = () => {
           
           {/* Mobile Menu Toggle */}
           <button 
-            className="md:hidden w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10"
+            className="md:hidden text-white"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            <div className={`w-5 h-0.5 bg-white transition-all relative ${isMenuOpen ? 'rotate-45' : ''}`}>
-              <div className={`absolute w-5 h-0.5 bg-white transition-all ${isMenuOpen ? 'opacity-0' : 'top-1.5'}`}></div>
-              <div className={`absolute w-5 h-0.5 bg-white transition-all ${isMenuOpen ? '-rotate-90' : '-top-1.5'}`}></div>
-            </div>
+            <span className="text-2xl">{isMenuOpen ? '✕' : '☰'}</span>
           </button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu Overlay */}
       {isMenuOpen && (
-        <div className="md:hidden mt-4 animate-fadeIn">
-          <div className="glass-card flex flex-col gap-2 !p-4">
-            {filteredLinks.map((link) => (
-              <Link 
-                key={link.path}
-                to={link.path}
-                className={`p-4 rounded-xl text-lg font-bold ${
-                  location.pathname === link.path ? 'bg-indigo-500/20 text-indigo-400' : 'text-slate-300'
-                }`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {link.name}
-              </Link>
-            ))}
-          </div>
+        <div className="md:hidden absolute top-full left-0 w-full bg-[#020617] border-b border-white/10 p-6 space-y-4 animate-fade-in">
+          {filteredLinks.map((link) => (
+            <Link 
+              key={link.path}
+              to={link.path}
+              className={`block text-lg font-bold ${
+                location.pathname === link.path ? 'text-white' : 'text-muted'
+              }`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              {link.name}
+            </Link>
+          ))}
+          {!user && (
+            <Link 
+              to="/login"
+              className="block text-lg font-bold text-indigo-400"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Sign In
+            </Link>
+          )}
         </div>
       )}
     </nav>

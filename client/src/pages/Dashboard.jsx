@@ -1,57 +1,82 @@
-import React, { useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
+import React from 'react';
+import { useAuth } from '../context/AuthContext';
 
 const Dashboard = () => {
-  const { user, logout } = useContext(AuthContext);
+  const { user, logout } = useAuth();
 
   if (!user) return null;
 
   return (
-    <div className="max-w-2xl mx-auto w-full animate-fade-in">
-      <div className="glass-card">
-        <header className="mb-10 text-center">
-          <h1 className="text-4xl font-extrabold mb-3">Welcome, <span className="glow-text">{user.name}</span> 👋</h1>
-          <p className="text-muted italic">You have successfully authenticated</p>
-        </header>
+    <div className="page-container max-w-4xl">
+      <header className="mb-16 animate-fade-in">
+        <h1 className="main-title mb-4">
+          Identity <br />
+          <span className="glow-text">Verification</span>
+        </h1>
+        <p className="text-xl text-muted font-medium mb-12">Review your secure credentials and university association protocol.</p>
+      </header>
 
-        <div className="space-y-6">
-          <h3 className="text-xs font-black text-muted uppercase tracking-[0.2em] mb-4 pl-1">Your Profile Information</h3>
-          
-          <div className="grid grid-cols-1 gap-4">
-            <div className="p-6 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group hover:border-indigo-500/30 transition-colors">
-              <div>
-                <p className="text-[10px] font-black text-muted uppercase tracking-widest mb-1">Account Role</p>
-                <p className="text-lg font-bold capitalize text-slate-200">{user.role}</p>
+      <div className="space-y-12 animate-slide-up">
+        <section className="space-y-6">
+           <div className="flex items-center gap-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]"></span>
+              <h3 className="text-xs font-black text-muted uppercase tracking-[0.2em]">Authorized Personnel</h3>
+           </div>
+           
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="glass-card !p-10 group hover:border-indigo-500/30 transition-all !rounded-[2rem]">
+                 <div className="flex items-start justify-between mb-8">
+                   <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
+                      {user.role[0].toUpperCase()}
+                   </div>
+                   <span className="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      Active Session
+                   </span>
+                 </div>
+                 <p className="text-[10px] font-black text-muted uppercase tracking-widest mb-1">Assigned Designation</p>
+                 <h4 className="text-2xl font-black tracking-tight capitalize">{user.role}</h4>
               </div>
-              <div className="w-10 h-10 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-400 font-bold group-hover:scale-110 transition-transform">
-                {user.role[0].toUpperCase()}
-              </div>
-            </div>
 
-            <div className="p-6 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group hover:border-indigo-500/30 transition-colors">
-              <div>
-                <p className="text-[10px] font-black text-muted uppercase tracking-widest mb-1">Email Address</p>
-                <p className="text-lg font-bold text-slate-200">{user.email}</p>
+              <div className="glass-card !p-10 group hover:border-indigo-500/30 transition-all !rounded-[2rem]">
+                 <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-3xl mb-8 group-hover:scale-110 transition-transform">
+                    ✉️
+                 </div>
+                 <p className="text-[10px] font-black text-muted uppercase tracking-widest mb-1">Communication Channel</p>
+                 <h4 className="text-2xl font-black tracking-tight truncate">{user.email}</h4>
               </div>
-              <span className="text-xl opacity-30">✉️</span>
-            </div>
+           </div>
+        </section>
 
-            <div className="p-6 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group hover:border-indigo-500/30 transition-colors">
-              <div>
-                <p className="text-[10px] font-black text-muted uppercase tracking-widest mb-1">College Identification</p>
-                <p className="text-sm font-bold text-indigo-300 break-all">{user.collegeId}</p>
+        <section className="space-y-6">
+           <div className="flex items-center gap-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]"></span>
+              <h3 className="text-xs font-black text-muted uppercase tracking-[0.2em]">Institutional Association</h3>
+           </div>
+           
+           <div className="sidebar-card !p-10 !rounded-[2.5rem] border-white/10 group hover:bg-white/[0.04]">
+              <div className="flex items-center justify-between">
+                <div className="space-y-2">
+                  <p className="text-[10px] font-black text-muted uppercase tracking-widest">College Identification ID</p>
+                  <p className="text-xl font-bold text-indigo-300 tracking-wider font-mono">{user.collegeId}</p>
+                </div>
+                <span className="text-4xl opacity-20 group-hover:opacity-60 transition-opacity">🆔</span>
               </div>
-              <span className="text-xl opacity-30">🆔</span>
-            </div>
-          </div>
-        </div>
+           </div>
+        </section>
 
-        <div className="mt-12 pt-8 border-t border-white/5">
-          <button className="btn-outline w-full py-4 text-rose-400 border-rose-500/20 hover:bg-rose-500/10 hover:border-rose-500/40" onClick={logout}>
-            Sign Out Securely
+        <div className="pt-16 border-t border-white/5">
+          <button 
+            className="w-full btn-outline py-6 !rounded-[2rem] text-rose-400 border-rose-500/10 hover:bg-rose-500/5 hover:border-rose-500/30 font-black uppercase tracking-[0.3em] text-xs transition-all active:scale-[0.98]" 
+            onClick={logout}
+          >
+            Terminate Secure Session
           </button>
         </div>
       </div>
+
+      <footer className="mt-32 text-center opacity-20">
+         <p className="text-[10px] font-black text-muted uppercase tracking-[0.5em]">Identity Verification Layer V2.4 — Status: Nominal</p>
+      </footer>
     </div>
   );
 };
