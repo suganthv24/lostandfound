@@ -4,7 +4,7 @@ export const createItem = async (req, res) => {
   try {
     const itemData = {
       ...req.body,
-      userId: req.user.id,
+      userId: req.user.userId,
       collegeId: req.user.collegeId,
     };
     const item = await itemService.createItem(itemData);
@@ -66,7 +66,7 @@ export const deleteItem = async (req, res) => {
     if (item.collegeId.toString() !== req.user.collegeId) {
       return res.status(403).json({ success: false, message: 'Access denied' });
     }
-    if (item.userId.toString() !== req.user.id) {
+    if (item.userId.toString() !== req.user.userId) {
       return res.status(403).json({ success: false, message: 'Unauthorized: Not the owner' });
     }
     await itemService.deleteItem(req.params.id);
@@ -85,7 +85,7 @@ export const updateStatus = async (req, res) => {
     if (item.collegeId.toString() !== req.user.collegeId) {
       return res.status(403).json({ success: false, message: 'Access denied' });
     }
-    if (item.userId.toString() !== req.user.id) {
+    if (item.userId.toString() !== req.user.userId) {
       return res.status(403).json({ success: false, message: 'Unauthorized: Not the owner' });
     }
     const updatedItem = await itemService.updateItemStatus(req.params.id, req.body.status || 'resolved');

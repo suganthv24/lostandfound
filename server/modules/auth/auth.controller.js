@@ -4,7 +4,7 @@ import { validationResult } from 'express-validator';
 import College from './college.model.js';
 import OTP from './otp.model.js';
 import User from './user.model.js';
-import { sendOTPEmail } from '../utils/mailer.js';
+import { sendOTPEmail } from '../../utils/mailer.js';
 
 const verifiedEmails = new Set();
 
@@ -68,7 +68,7 @@ export const sendOtp = async (req, res) => {
 
     return res.status(200).json({ success: true, message: 'OTP sent successfully' });
   } catch (error) {
-    console.error('Send OTP error:', error);
+    console.error('Send OTP error detailed:', error);
     return res.status(500).json({ success: false, message: 'Failed to send OTP email' });
   }
 };

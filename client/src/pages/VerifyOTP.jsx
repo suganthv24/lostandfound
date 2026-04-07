@@ -82,43 +82,62 @@ const VerifyOTP = () => {
   };
 
   return (
-    <div className={`glass-card ${shake ? 'shake' : ''}`}>
-      <StepIndicator currentStep={3} />
-      <h1>Verify OTP</h1>
-      <p className="subtitle">OTP sent to {email}</p>
-
-      <form onSubmit={handleSubmit}>
-        <div className="otp-container">
-          {otp.map((digit, i) => (
-            <input
-              key={i}
-              ref={el => inputRefs.current[i] = el}
-              className="otp-box"
-              type="text"
-              value={digit}
-              onChange={(e) => handleChange(e, i)}
-              onKeyDown={(e) => handleKeyDown(e, i)}
-              maxLength={1}
-            />
-          ))}
+    <div className="max-w-xl w-full animate-fade-in mx-auto">
+      <div className={`glass-card ${shake ? 'shake' : ''}`}>
+        <div className="mb-10">
+          <StepIndicator currentStep={3} />
         </div>
         
-        {error && <div className="error-text" style={{ textAlign: 'center', marginBottom: '1rem' }}>{error}</div>}
+        <h1 className="text-3xl font-extrabold mb-2">Verify <span className="glow-text">OTP</span></h1>
+        <p className="text-muted mb-8 italic text-center">We've sent a 6-digit code to <br/><span className="text-indigo-300 font-bold">{email}</span></p>
 
-        <div className="timer">
-          {timeLeft > 0 ? formatTime() : 'OTP Expired'}
-        </div>
+        <form onSubmit={handleSubmit} className="space-y-8">
+          <div className="flex justify-between gap-2 md:gap-4">
+            {otp.map((digit, i) => (
+              <input
+                key={i}
+                ref={el => inputRefs.current[i] = el}
+                className="input-field !p-0 w-full h-14 md:h-16 text-center text-2xl font-bold rounded-2xl"
+                type="text"
+                value={digit}
+                onChange={(e) => handleChange(e, i)}
+                onKeyDown={(e) => handleKeyDown(e, i)}
+                maxLength={1}
+              />
+            ))}
+          </div>
+          
+          {error && <div className="text-rose-400 text-xs font-bold text-center animate-shake">{error}</div>}
 
-        <button type="submit" className="btn" disabled={loading || timeLeft === 0 || otp.join('').length < 6}>
-          {loading ? <div className="spinner" /> : 'Verify'}
-        </button>
+          <div className="text-center">
+            <div className={`inline-block px-4 py-2 rounded-full text-xs font-bold tracking-widest bg-white/5 border border-white/10 ${timeLeft < 60 ? 'text-rose-400' : 'text-indigo-400'}`}>
+              {timeLeft > 0 ? (
+                <span className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-current animate-pulse"></span>
+                  {formatTime()} remaining
+                </span>
+              ) : (
+                'OTP Expired'
+              )}
+            </div>
+          </div>
 
-        {timeLeft === 0 && (
-          <button type="button" className="btn btn-secondary mt-4" onClick={handleResend}>
-            Resend OTP
+          <button type="submit" className="btn-primary w-full py-4 mt-4" disabled={loading || timeLeft === 0 || otp.join('').length < 6}>
+            {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto" /> : 'Verify Code'}
           </button>
-        )}
-      </form>
+
+          <div className="text-center pt-4">
+            <button 
+              type="button" 
+              className={`text-xs font-black uppercase tracking-widest transition-colors ${timeLeft === 0 ? 'text-indigo-400 hover:text-indigo-300' : 'text-muted cursor-not-allowed opacity-50'}`}
+              onClick={handleResend}
+              disabled={timeLeft > 0}
+            >
+              {timeLeft > 0 ? `Resend available in ${formatTime()}` : 'Resend Verification Code'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

@@ -1,11 +1,28 @@
-// Placeholder auth middleware
-// In a real app, this would verify JWT and attach user to req.user
-export const authMiddleware = (req, res, next) => {
-  // For now, mock a user
-  req.user = {
-    id: '64f1a2b3c4d5e6f7a8b9c0d1', // Mock user ID
-    collegeId: '64f1a2b3c4d5e6f7a8b9c0d2', // Mock college ID
-    name: 'Test User'
-  };
-  next();
+import jwt from 'jsonwebtoken';
+
+const authMiddleware = (req, res, next) => {
+  try {
+    const authHeader = req.header('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ success: false, message: 'No token provided' });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    req.user = {
+      userId: decoded.userId,
+      email: decoded.email,
+      collegeId: decoded.collegeId
+    };
+
+    next();
+  } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ success: false, message: 'Invalid or expired token' });
+    }
+    return res.status(401).json({ success: false, message: 'Invalid or expired token' });
+  }
 };
+
+export { authMiddleware };

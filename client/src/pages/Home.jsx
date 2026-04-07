@@ -32,42 +32,60 @@ const Home = () => {
   };
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      <header className="text-center space-y-4 py-8">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight">
-          Find what you <span className="text-blue-600">lost</span>, return what you <span className="text-green-600">found</span>.
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-fade-in">
+      <header className="text-center mb-16 space-y-6">
+        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
+          Find what you <span className="glow-text">lost</span>,<br className="sm:hidden" /> return what you <span className="glow-text">found</span>.
         </h1>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+        <p className="text-lg md:text-xl text-muted max-w-2xl mx-auto leading-relaxed">
           The community-driven lost and found platform. Search through reported items or report a new one to help others.
         </p>
-        <div className="pt-4">
+        <div className="pt-8 px-4">
           <SearchBar onSearch={handleSearch} />
         </div>
       </header>
 
       <main>
         {loading ? (
-          <Loader />
+          <div className="flex justify-center py-20">
+            <Loader />
+          </div>
         ) : error ? (
-          <div className="text-center py-20">
-            <p className="text-red-500 font-medium text-lg">{error}</p>
+          <div className="glass-card text-center py-16 max-w-lg mx-auto">
+            <div className="text-5xl mb-4 text-rose-500">⚠️</div>
+            <p className="text-rose-400 font-medium text-lg mb-6">{error}</p>
             <button 
               onClick={() => fetchItems()} 
-              className="mt-4 text-blue-600 hover:underline font-bold"
+              className="btn-outline"
             >
               Try Again
             </button>
           </div>
         ) : items.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-3xl shadow-sm border-2 border-dashed border-gray-200">
-            <div className="text-6xl mb-4">🔍</div>
-            <h3 className="text-xl font-bold text-gray-800">No items found</h3>
-            <p className="text-gray-500 mt-2">Try adjusting your search or report a new item.</p>
+          <div className="glass-card text-center py-20 animate-slide-up max-w-3xl mx-auto">
+            <div className="relative inline-block mb-6">
+              <span className="text-7xl">🔍</span>
+              <div className="absolute -top-2 -right-2 w-4 h-4 bg-indigo-500 rounded-full animate-ping"></div>
+            </div>
+            <h3 className="text-2xl font-bold mb-3">No items found</h3>
+            <p className="text-muted max-w-md mx-auto">
+              We couldn't find anything matching your search. Try adjusting your keywords or be the first to report this item.
+            </p>
+            <div className="mt-8">
+              <button 
+                onClick={() => fetchItems()} 
+                className="btn-outline text-sm"
+              >
+                View All Items
+              </button>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {items.map((item) => (
-              <ItemCard key={item._id} item={item} />
+            {items.map((item, index) => (
+              <div key={item._id} className="animate-slide-up" style={{ animationDelay: `${index * 0.05}s` }}>
+                <ItemCard item={item} />
+              </div>
             ))}
           </div>
         )}

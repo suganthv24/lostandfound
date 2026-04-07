@@ -69,7 +69,7 @@ const Login = () => {
     try {
       const { data } = await loginVerify(email, otpString);
       setAuth(data.token, data.user);
-      navigate('/dashboard');
+      navigate('/home');
     } catch (err) {
       setError(err.response?.data?.message || 'Invalid OTP');
       setShake(true);
@@ -86,58 +86,89 @@ const Login = () => {
   };
 
   return (
-    <div className={`glass-card ${shake ? 'shake' : ''}`}>
-      <h1>Welcome Back</h1>
-      <p className="subtitle">Sign in to your account</p>
+    <div className="max-w-md w-full animate-fade-in mx-auto">
+      <div className={`glass-card ${shake ? 'shake' : ''}`}>
+        <h1 className="text-3xl font-extrabold mb-2">Welcome <span className="glow-text">Back</span></h1>
+        <p className="text-muted mb-8 italic">Sign in to your account to continue</p>
 
-      {step === 1 ? (
-        <form onSubmit={handleEmailSubmit}>
-          <div className="form-group">
-            <label>Email Address</label>
-            <input 
-              type="email" 
-              placeholder="user@college.edu" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            {error && <div className="error-text">{error}</div>}
-          </div>
-          <button type="submit" className="btn mt-4" disabled={loading}>
-            {loading ? <div className="spinner" /> : 'Send OTP'}
-          </button>
-        </form>
-      ) : (
-        <form onSubmit={handleOtpSubmit}>
-          <p style={{ fontSize: '0.9rem', marginBottom: '1rem', color: 'var(--text-muted)' }}>
-            OTP sent to {email}
-          </p>
-          <div className="otp-container">
-            {otp.map((digit, i) => (
-              <input
-                key={i}
-                ref={el => inputRefs.current[i] = el}
-                className="otp-box"
-                type="text"
-                value={digit}
-                onChange={(e) => handleOtpChange(e, i)}
-                onKeyDown={(e) => handleOtpKeyDown(e, i)}
-                maxLength={1}
+        {step === 1 ? (
+          <form onSubmit={handleEmailSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-xs font-black text-muted uppercase tracking-widest pl-1">Email Address</label>
+              <input 
+                type="email" 
+                placeholder="name@college.edu" 
+                className="input-field"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
-            ))}
-          </div>
-          {error && <div className="error-text text-center mb-2">{error}</div>}
-          
-          <div className="timer">{timeLeft > 0 ? formatTime() : 'OTP Expired'}</div>
+              {error && <div className="text-rose-400 text-xs font-bold pl-1 animate-fadeIn">{error}</div>}
+            </div>
+            <button type="submit" className="btn-primary w-full py-4 mt-2" disabled={loading}>
+              {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto" /> : 'Send Verification OTP'}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleOtpSubmit} className="space-y-8">
+            <div className="text-center space-y-2">
+              <p className="text-sm text-muted">
+                OTP sent to <span className="text-indigo-300 font-bold">{email}</span>
+              </p>
+              <button 
+                type="button" 
+                onClick={() => setStep(1)}
+                className="text-[10px] uppercase tracking-widest font-black text-indigo-400 hover:text-indigo-300"
+              >
+                Change Email
+              </button>
+            </div>
+            
+            <div className="flex justify-between gap-2">
+              {otp.map((digit, i) => (
+                <input
+                  key={i}
+                  ref={el => inputRefs.current[i] = el}
+                  className="input-field !p-0 w-12 h-14 text-center text-xl font-bold rounded-xl"
+                  type="text"
+                  value={digit}
+                  onChange={(e) => handleOtpChange(e, i)}
+                  onKeyDown={(e) => handleOtpKeyDown(e, i)}
+                  maxLength={1}
+                />
+              ))}
+            </div>
+            
+            {error && <div className="text-rose-400 text-xs font-bold text-center animate-shake">{error}</div>}
+            
+            <div className="text-center">
+               <div className={`inline-block px-4 py-2 rounded-full text-xs font-bold tracking-widest bg-white/5 border border-white/10 ${timeLeft < 60 ? 'text-rose-400' : 'text-indigo-400'}`}>
+                {timeLeft > 0 ? (
+                  <span className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-current animate-pulse"></span>
+                    {formatTime()} remaining
+                  </span>
+                ) : (
+                  'OTP Expired'
+                )}
+              </div>
+            </div>
 
-          <button type="submit" className="btn" disabled={loading || timeLeft === 0 || otp.join('').length < 6}>
-            {loading ? <div className="spinner" /> : 'Sign In'}
+            <button type="submit" className="btn-primary w-full py-4" disabled={loading || timeLeft === 0 || otp.join('').length < 6}>
+              {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto" /> : 'Sign In Now'}
+            </button>
+          </form>
+        )}
+
+        <div className="mt-10 pt-6 border-t border-white/5 text-center">
+          <p className="text-sm text-muted mb-4">Don't have an account yet?</p>
+          <button 
+            onClick={() => navigate('/signup')} 
+            className="btn-outline w-full py-3 text-sm font-bold"
+          >
+            Create New Account
           </button>
-        </form>
-      )}
-
-      <a href="/signup" className="link" onClick={(e) => { e.preventDefault(); navigate('/signup'); }}>
-        Don't have an account? Sign up
-      </a>
+        </div>
+      </div>
     </div>
   );
 };

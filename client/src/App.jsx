@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import Navbar from './components/Navbar';
 
 import SelectCollege from './pages/SelectCollege';
 import ValidateEmail from './pages/ValidateEmail';
@@ -10,31 +11,59 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 
+// Item System Pages
+import Home from './pages/Home';
+import CreateItem from './pages/CreateItem';
+import ItemDetails from './pages/ItemDetails';
+import MyItems from './pages/MyItems';
+
 function App() {
   return (
     <Router>
       <AuthProvider>
-        <div className="app-container">
-          <Routes>
-            <Route path="/" element={<Navigate to="/signup" replace />} />
-            <Route path="/signup" element={<SelectCollege />} />
-            <Route path="/signup/email" element={<ValidateEmail />} />
-            <Route path="/signup/verify-otp" element={<VerifyOTP />} />
-            <Route path="/signup/register" element={<Register />} />
+        <div className="app-container min-h-screen flex flex-col">
+          <Navbar />
+          <main className="flex-grow container mx-auto px-4 py-8">
+            <Routes>
+              <Route path="/" element={<Navigate to="/home" replace />} />
 
-            <Route path="/login" element={<Login />} />
+              {/* Authentication Routes */}
+              <Route path="/signup" element={<SelectCollege />} />
+              <Route path="/signup/email" element={<ValidateEmail />} />
+              <Route path="/signup/verify-otp" element={<VerifyOTP />} />
+              <Route path="/signup/register" element={<Register />} />
+              <Route path="/login" element={<Login />} />
 
-            <Route
-              path="/dashboard"
-              element={
+              {/* Protected Protected Routes */}
+              <Route path="/home" element={
+                <ProtectedRoute>
+                  <Home />
+                </ProtectedRoute>
+              } />
+              <Route path="/dashboard" element={
                 <ProtectedRoute>
                   <Dashboard />
                 </ProtectedRoute>
-              }
-            />
+              } />
+              <Route path="/items/:id" element={
+                <ProtectedRoute>
+                  <ItemDetails />
+                </ProtectedRoute>
+              } />
+              <Route path="/create" element={
+                <ProtectedRoute>
+                  <CreateItem />
+                </ProtectedRoute>
+              } />
+              <Route path="/my-items" element={
+                <ProtectedRoute>
+                  <MyItems />
+                </ProtectedRoute>
+              } />
 
-            <Route path="*" element={<Navigate to="/login" replace />} />
-          </Routes>
+              <Route path="*" element={<Navigate to="/login" replace />} />
+            </Routes>
+          </main>
         </div>
       </AuthProvider>
     </Router>
