@@ -4,7 +4,7 @@ import { validationResult } from 'express-validator';
 import College from './college.model.js';
 import OTP from './otp.model.js';
 import User from './user.model.js';
-import { sendOtpEmail } from './auth.service.js';
+import { sendOTPEmail } from '../utils/mailer.js';
 
 const verifiedEmails = new Set();
 
@@ -55,7 +55,7 @@ export const sendOtp = async (req, res) => {
   const { email } = req.body;
 
   try {
-    const otp = '123456';
+    const otp = crypto.randomInt(100000, 999999).toString();
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 mins
 
     await OTP.findOneAndUpdate(
@@ -64,15 +64,12 @@ export const sendOtp = async (req, res) => {
       { upsert: true, new: true }
     );
 
-    // Bypass real email sending for development
-    // const emailSent = await sendOtpEmail(email, otp);
-    // if (!emailSent) {
-    //   return res.status(500).json({ success: false, message: 'Failed to send OTP email' });
-    // }
+    await sendOTPEmail(email, otp);
 
     return res.status(200).json({ success: true, message: 'OTP sent successfully' });
   } catch (error) {
-    return res.status(500).json({ success: false, message: 'Server error' });
+    console.error('Send OTP error:', error);
+    return res.status(500).json({ success: false, message: 'Failed to send OTP email' });
   }
 };
 
@@ -116,10 +113,9 @@ export const register = async (req, res) => {
   const { name, email, phone, collegeId, role } = req.body;
 
   try {
-    // Temporarily disabled to prevent issues if backend restarts while user is mid-signup
-    // if (!verifiedEmails.has(email)) {
-    //   return res.status(403).json({ success: false, message: 'Email not verified' });
-    // }
+    if (!verifiedEmails.has(email)) {
+      return res.status(403).json({ success: false, message: 'Email not verified' });
+    }
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {

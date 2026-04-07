@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import StepIndicator from '../components/StepIndicator';
-import { validateEmail, sendOtp, verifyOtp } from '../api/auth.api';
+import { validateEmail, sendOtp } from '../api/auth.api';
 
 const ValidateEmail = () => {
   const { state } = useLocation();
@@ -26,8 +26,7 @@ const ValidateEmail = () => {
     try {
       await validateEmail(email, collegeId);
       await sendOtp(email);
-      await verifyOtp(email, '123456');
-      navigate('/signup/register', { state: { email, collegeId } });
+      navigate('/signup/verify-otp', { state: { email, collegeId } });
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to validate email');
     } finally {
