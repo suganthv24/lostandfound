@@ -1,20 +1,36 @@
 const sendEmail = require('../utils/email');
+const Item = require('../models/Item');
+const User = require('../models/User');
 
 exports.contactOwner = async (req, res) => {
   try {
-    const { itemId } = req.params;
-    const { finderName, finderEmail, finderPhone, message } = req.body;
+    // Phase 3: Get itemId, message, and sender
+    const itemId = req.params.id || req.params.itemId; // Try both just in case routes differ
+    const { message } = req.body;
+    const sender = req.user; // This will come from auth middleware later
 
-    // TODO: During Full Integration (Phase 1):
-    // const item = await Item.findById(itemId).populate('creatorId');
-    // if (!item) return res.status(404).json({ success: false, message: 'Item not found' });
-    // const ownerEmail = item.creatorId.email;
-    // const itemName = item.name;
+    // Validate that required fields exist
+    if (!message) {
+      return res.status(400).json({ success: false, message: 'Message is required' });
+    }
 
-    // --- MOCK DATA FOR TESTING API INDEPENDENTLY ---
-    const ownerEmail = 'test@example.com'; // Replace with a real email to test
-    const itemName = 'Lost Item (Placeholder)';
-    // -----------------------------------------------
+    if (!sender) {
+      return res.status(401).json({ success: false, message: 'Unauthorized. No user found.' });
+    }
+
+    // Phase 4: Integration - Fetch Item and Owner
+    const item = await Item.findById(itemId);
+    if (!item) {
+      return res.status(404).json({ success: false, message: 'Item not found' });
+    }
+
+    const owner = await User.findById(item.userId);
+    if (!owner) {
+      return res.status(404).json({ success: false, message: 'Item owner not found in database' });
+    }
+
+    const ownerEmail = owner.email; 
+    const itemName = item.name;
 
     const emailMessage = `
 Hi there,
@@ -22,9 +38,8 @@ Hi there,
 Good news! Someone has found your lost item: ${itemName}.
 
 Finder Details:
-Name: ${finderName}
-Email: ${finderEmail}
-Phone: ${finderPhone || 'Not provided'}
+Email: ${sender.email}
+Phone: ${sender.phone || 'Not provided'}
 
 Message from finder:
 "${message}"
