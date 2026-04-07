@@ -1,10 +1,11 @@
 const express = require('express');
 const { contactOwner } = require('../controllers/contactController');
+const authMiddleware = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
 // POST /items/:itemId/contact
-// Note: In Phase 1 integration, add "verifyToken" middleware here
-router.post('/:itemId/contact', contactOwner);
+// Phase 6: Apply authMiddleware to protect the route
+router.post('/:itemId/contact', authMiddleware, contactOwner);
 
 module.exports = router;
