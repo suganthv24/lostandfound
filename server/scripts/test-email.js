@@ -1,5 +1,5 @@
-require('dotenv').config();
-const sendEmail = require('./utils/email');
+import 'dotenv/config';
+import sendEmail from '../utils/email.js';
 
 async function runTest() {
   try {

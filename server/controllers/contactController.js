@@ -1,8 +1,8 @@
-const sendEmail = require('../utils/email');
-const Item = require('../models/Item');
-const User = require('../models/User');
+import sendEmail from '../utils/email.js';
+import Item from '../models/Item.js';
+import User from '../models/user.model.js';
 
-exports.contactOwner = async (req, res) => {
+export const contactOwner = async (req, res) => {
   try {
     // Phase 3: Get itemId, message, and sender
     const itemId = req.params.id || req.params.itemId; // Try both just in case routes differ
@@ -29,7 +29,7 @@ exports.contactOwner = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Item owner not found in database' });
     }
 
-    const ownerEmail = owner.email; 
+    const ownerEmail = owner.email;
     const itemName = item.name;
 
     const emailMessage = `

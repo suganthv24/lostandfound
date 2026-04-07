@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const itemSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -9,4 +9,4 @@ const itemSchema = new mongoose.Schema({
   // Additional Dev 2 fields like image, location, etc. can be added here
 }, { timestamps: true });
 
-module.exports = mongoose.model('Item', itemSchema);
+export default mongoose.model('Item', itemSchema);

@@ -1,6 +1,6 @@
-const express = require('express');
-const { contactOwner } = require('../controllers/contactController');
-const authMiddleware = require('../middleware/authMiddleware');
+import express from 'express';
+import { contactOwner } from '../controllers/contactController.js';
+import authMiddleware from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -8,4 +8,4 @@ const router = express.Router();
 // Phase 6: Apply authMiddleware to protect the route
 router.post('/:itemId/contact', authMiddleware, contactOwner);
 
-module.exports = router;
+export default router;

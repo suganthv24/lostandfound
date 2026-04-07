@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import College from './auth/college.model.js';
+import College from '../models/college.model.js';
 import dotenv from 'dotenv';
 dotenv.config();
 

@@ -1,10 +1,10 @@
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import { validationResult } from 'express-validator';
-import College from './college.model.js';
-import OTP from './otp.model.js';
-import User from './user.model.js';
-import { sendOTPEmail } from '../utils/mailer.js';
+import College from '../models/college.model.js';
+import OTP from '../models/otp.model.js';
+import User from '../models/user.model.js';
+import { sendOTPEmail } from '../utils/auth.service.js';
 
 const verifiedEmails = new Set();
 

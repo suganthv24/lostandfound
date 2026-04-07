@@ -1,5 +1,5 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+import jwt from 'jsonwebtoken';
+import User from '../models/user.model.js';
 
 const authMiddleware = async (req, res, next) => {
   try {
@@ -20,7 +20,7 @@ const authMiddleware = async (req, res, next) => {
 
     // Fetch the user from the database and attach to req.user
     // We exclude the password for security
-    const currentUser = await User.findById(decoded.id).select('-password');
+    const currentUser = await User.findById(decoded.id || decoded.userId).select('-password');
     
     if (!currentUser) {
       return res.status(401).json({ success: false, message: 'The user belonging to this token no longer exists.' });
@@ -35,4 +35,4 @@ const authMiddleware = async (req, res, next) => {
   }
 };
 
-module.exports = authMiddleware;
+export default authMiddleware;
