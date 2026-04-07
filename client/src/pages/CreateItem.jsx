@@ -31,9 +31,16 @@ const CreateItem = () => {
     setError(null);
 
     try {
-      await createItem(formData);
+      const dataToSubmit = {
+        ...formData,
+        imageUrl: formData.image,
+        dateTime: formData.date ? new Date(formData.date).toISOString() : new Date().toISOString(),
+      };
+      // Remove temporary fields if necessary, but backend is fine with extra fields
+      await createItem(dataToSubmit);
       navigate('/');
     } catch (err) {
+
       setError(err.response?.data?.message || 'Failed to create item. Please check your inputs.');
     } finally {
       setLoading(false);
