@@ -5,7 +5,7 @@ import { verifyOtp, sendOtp } from '../api/auth.api';
 
 const VerifyOTP = () => {
   const { state } = useLocation();
-  const [otp, setOtp] = useState(['1', '2', '3', '4', '5', '6']);
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [timeLeft, setTimeLeft] = useState(300); // 5 mins

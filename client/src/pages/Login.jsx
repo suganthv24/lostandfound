@@ -9,7 +9,7 @@ const Login = () => {
   
   const [step, setStep] = useState(1); // 1: Email, 2: OTP
   const [email, setEmail] = useState('');
-  const [otp, setOtp] = useState(['1', '2', '3', '4', '5', '6']);
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [shake, setShake] = useState(false);
@@ -31,9 +31,8 @@ const Login = () => {
     setError('');
     try {
       await login(email);
-      const { data } = await loginVerify(email, '123456');
-      setAuth(data.token, data.user);
-      navigate('/dashboard');
+      setStep(2);
+      setTimeLeft(300);
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
     } finally {
