@@ -4,6 +4,9 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import itemRoutes from './modules/items/item.routes.js';
 import { errorHandler } from './middlewares/error.middleware.js';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import authRoutes from './auth/auth.routes.js';
 
 dotenv.config();
 
